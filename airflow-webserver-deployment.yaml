@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-webserver
+  labels:
+    app: airflow-k8s
+
+spec:
+  selector:
+    matchLabels:
+      app: airflow-webserver
+
+  replicas: 1
+
+  template:
+    metadata:
+      labels:
+        app: airflow-webserver
+
+    spec:
+      containers:
+      - name: airflow-webserver
+        image: puckel/docker-airflow:1.10.9
+        envFrom:
+          - configMapRef:
+              name: airflow-envvars-configmap
+        resources:
+          limits:
+            memory: "2Gi"
+            # cpu: "100"
+        ports:
+          - containerPort: 8080
+        volumeMounts:
+          - name: requirements-configmap
+            subPath: "requirements.txt"
+            mountPath: "/requirements.txt"
+          - name: dags-host-volume
+            mountPath: /usr/local/airflow/dags
+          - name: logs-persistent-storage
+            mountPath: /usr/local/airflow/logs
+      volumes:
+        - name: requirements-configmap
+          configMap:
+            name: requirements-configmap
+        - name: dags-host-volume
+          hostPath:
+            path: /mnt/airflow/dags
+            type: Directory
+        - name: logs-persistent-storage
+          persistentVolumeClaim:
+              claimName: airflow-logs-pvc

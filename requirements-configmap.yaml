@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: requirements-configmap
+data:
+  requirements.txt: |
+    apache-airflow[kubernetes]==1.10.9

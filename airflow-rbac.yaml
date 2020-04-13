@@ -1,0 +1,23 @@
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: pods-permissions
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch", "create", "delete"]
+
+--- 
+
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: pods-permissions
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: default
+roleRef:
+  kind: ClusterRole
+  name: pods-permissions
+  apiGroup: rbac.authorization.k8s.io
